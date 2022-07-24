@@ -3,7 +3,7 @@ import json
 import re
 from base64 import b64encode
 from app import create_app, db
-from app.models import User, Role, Post, Comment
+from app.models import User, Role, Account, Profile
 
 
 class APITestCase(unittest.TestCase):
@@ -45,8 +45,8 @@ class APITestCase(unittest.TestCase):
         # add a user
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=True,
-                 role=r)
+        a = Account(email='john@example.com', password='cat', confirmed=True)
+        u = User(account=a, role=r)
         db.session.add(u)
         db.session.commit()
 
@@ -96,8 +96,8 @@ class APITestCase(unittest.TestCase):
         # add an unconfirmed user
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u = User(email='john@example.com', password='cat', confirmed=False,
-                 role=r)
+        a = Account(email='john@example.com', password='cat', confirmed=False)
+        u = User(account=a, role=r)
         db.session.add(u)
         db.session.commit()
 
@@ -179,10 +179,12 @@ class APITestCase(unittest.TestCase):
         # add two users
         r = Role.query.filter_by(name='User').first()
         self.assertIsNotNone(r)
-        u1 = User(email='john@example.com', username='john',
-                  password='cat', confirmed=True, role=r)
-        u2 = User(email='susan@example.com', username='susan',
-                  password='dog', confirmed=True, role=r)
+        a1 = Account(email='john@example.com', password='cat', confirmed=True)
+        u1 = User(account=a1, role=r)
+        u1.profile.username='john'
+        a2 = Account(email='susan@example.com', password='dog', confirmed=True)
+        u2 = User(account=a2, role=r)
+        u2.profile.username='susan'
         db.session.add_all([u1, u2])
         db.session.commit()
 
