@@ -70,6 +70,7 @@ class Permission:
   MODERATE = 8
   ADMIN = 16
 
+
 class Follow(db.Model):
     __tablename__ = 'follows'
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
@@ -271,6 +272,10 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+
+"""class Account(UserMixin, db.Model):
+    pass"""
 
 
 class Post(db.Model):
