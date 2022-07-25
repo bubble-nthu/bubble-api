@@ -1,17 +1,21 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
+from datetime import datetime
+
 from . import auth
 from .. import db
 from ..models import User
 #from ..email import send_email
 from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+from ..services.verify_registration import VerifyRegistration
+from ..services.email import Email
 
 
 @auth.before_app_request
 def before_request():
     if current_user.is_authenticated:
-        current_user.ping()
+        current_user.profile.ping()
         """if not current_user.confirmed \
                 and request.endpoint \
                 and request.blueprint != 'auth' \
@@ -53,14 +57,15 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data.lower(),
+        email = form.email.data.lower()
+        user = User(email=email,
                     username=form.username.data,
                     password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        token = user.generate_confirmation_token()
-        #send_email(user.email, 'Confirm Your Account',
-        #           'auth/email/confirm', user=user, token=token)
+        token = VerifyRegistration.generate_confirmation_token(email)
+        Email.send(user.email, 'Confirm Your Account',
+                   'auth/email/confirm', user=user, token=token)
         flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
@@ -70,12 +75,19 @@ def register():
 @login_required
 def confirm(token):
     if current_user.confirmed:
-        return redirect(url_for('main.index'))
-    if current_user.confirm(token):
-        db.session.commit()
-        flash('You have confirmed your account. Thanks!')
+        flash('Account already confirmed.', 'success')
     else:
-        flash('The confirmation link is invalid or has expired.')
+        try:
+            email = VerifyRegistration.confirm_token(token)
+        except:
+            flash('The confirmation link is invalid or has expired.', 'danger')
+            
+        user = User.query.filter_by(email=email).first_or_404()
+        user.confirmed = True
+        user.confirmed_on = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        flash('You have confirmed your account. Thanks!', 'success')
     return redirect(url_for('main.index'))
 
 

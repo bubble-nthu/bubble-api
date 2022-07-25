@@ -84,6 +84,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, index=True)
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
+    registered_on = db.Column(db.DateTime, nullable=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
     confirmed = db.Column(db.Boolean, default=False)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.id'))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
@@ -100,6 +102,20 @@ class User(UserMixin, db.Model):
                                 cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     profile = db.relationship('Profile', back_populates='user')
+
+    def __init__(self, **kwargs):
+        #to know when the user registrate, which is the time sent request
+        self.registered_on = datetime.now()
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            #if self.role == current_app.config['FLASKY_ADMIN']:
+            #  self.role = Role.query.filter_by(name='Administrator').first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
+        if self.profile is None:
+            self.profile = Profile(user=self)
+        self.follow(self)
+
 
     @property
     def password(self):
@@ -124,17 +140,6 @@ class User(UserMixin, db.Model):
                 user.follow(user)
                 db.session.add(user)
                 db.session.commit()
-
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
-        if self.role is None:
-            #if self.role == current_app.config['FLASKY_ADMIN']:
-            #  self.role = Role.query.filter_by(name='Administrator').first()
-            if self.role is None:
-                self.role = Role.query.filter_by(default=True).first()
-        if self.profile is None:
-            self.profile = Profile(user=self)
-        self.follow(self)
 
     def can(self, perm):
         return self.role is not None and self.role.has_permission(perm)

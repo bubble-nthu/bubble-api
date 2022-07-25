@@ -1,13 +1,28 @@
 import os
+import yaml
+from yaml.loader import SafeLoader
+
+# Open the file and load the file
+with open('secrets.yml') as f:
+    secrets = yaml.load(f, Loader=SafeLoader)
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
   SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
+  SECURITY_PASSWORD_SALT  = 'my_precious_two'
   SQLALCHEMY_TRACK_MODIFICATIONS = False
   BUBBLE_POSTS_PER_PAGE = 10
   BUBBLE_FOLLOWERS_PER_PAGE = 10
   BUBBLE_COMMENTS_PER_PAGE = 10
   SSL_REDIRECT = False
+  MAIL_SERVER = 'smtp.sendgrid.net'
+  MAIL_PORT = 587
+  MAIL_USE_TLS = True
+  MAIL_USERNAME = 'apikey'
+  MAIL_PASSWORD = os.environ.get('SENDGRID_API_KEY') or secrets['SENDGRID_API_KEY']
+  MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
+  MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
 
   @staticmethod
   def init_app(app):
