@@ -1,4 +1,4 @@
-"""
+
 import re
 import unittest
 from app import create_app, db
@@ -57,4 +57,3 @@ class FlaskClientTestCase(unittest.TestCase):
         response = self.client.get('/auth/logout', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'You have been logged out' in response.data)
-"""
