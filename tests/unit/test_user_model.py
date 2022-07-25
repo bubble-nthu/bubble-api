@@ -2,7 +2,7 @@ import unittest
 import time
 from datetime import datetime
 from app import create_app, db
-from app.models import User, AnonymousUser, Role, Permission, Follow
+from app.models import User, AnonymousUser, Role, Permission, Follow, Account
 
 
 class UserModelTestCase(unittest.TestCase):
@@ -19,27 +19,9 @@ class UserModelTestCase(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def test_password_setter(self):
-        u = User(password='cat')
-        self.assertTrue(u.password_hash is not None)
-
-    def test_no_password_getter(self):
-        u = User(password='cat')
-        with self.assertRaises(AttributeError):
-            u.password
-
-    def test_password_verification(self):
-        u = User(password='cat')
-        self.assertTrue(u.verify_password('cat'))
-        self.assertFalse(u.verify_password('dog'))
-
-    def test_password_salts_are_random(self):
-        u = User(password='cat')
-        u2 = User(password='cat')
-        self.assertTrue(u.password_hash != u2.password_hash)
-
     def test_user_role(self):
-        u = User(email='john@example.com', password='cat')
+        a = Account(email='john@example.com', password='cat')
+        u = User(account = a)
         self.assertTrue(u.can(Permission.FOLLOW))
         self.assertTrue(u.can(Permission.COMMENT))
         self.assertTrue(u.can(Permission.WRITE))
@@ -48,7 +30,8 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_moderator_role(self):
         role = Role.query.filter_by(name='Moderator').first()
-        user = User(email='john@example.com', password='cat', role=role)
+        a = Account(email='john@example.com', password='cat')
+        user = User(account=a, role=role)
         self.assertTrue(user.can(Permission.FOLLOW))
         self.assertTrue(user.can(Permission.COMMENT))
         self.assertTrue(user.can(Permission.WRITE))
@@ -57,7 +40,8 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_administrator_role(self):
         r = Role.query.filter_by(name='Administrator').first()
-        u = User(email='john@example.com', password='cat', role=r)
+        a = Account(email='john@example.com', password='cat')
+        u = User(account=a, role=r)
         self.assertTrue(u.can(Permission.FOLLOW))
         self.assertTrue(u.can(Permission.COMMENT))
         self.assertTrue(u.can(Permission.WRITE))
@@ -72,39 +56,11 @@ class UserModelTestCase(unittest.TestCase):
         self.assertFalse(u.can(Permission.MODERATE))
         self.assertFalse(u.can(Permission.ADMIN))
 
-    def test_timestamps(self):
-        u = User(password='cat')
-        db.session.add(u)
-        db.session.commit()
-        self.assertTrue(
-            (datetime.utcnow() - u.member_since).total_seconds() < 3)
-        self.assertTrue(
-            (datetime.utcnow() - u.last_seen).total_seconds() < 3)
-
-    def test_ping(self):
-        u = User(password='cat')
-        db.session.add(u)
-        db.session.commit()
-        time.sleep(2)
-        last_seen_before = u.last_seen
-        u.ping()
-        self.assertTrue(u.last_seen > last_seen_before)
-
-    def test_gravatar(self):
-        u = User(email='john@example.com', password='cat')
-        with self.app.test_request_context('/'):
-            gravatar = u.gravatar()
-            gravatar_256 = u.gravatar(size=256)
-            gravatar_pg = u.gravatar(rating='pg')
-            gravatar_retro = u.gravatar(default='retro')
-        self.assertTrue('https://secure.gravatar.com/avatar/d4c74594d841139328695756648b6bd6'in gravatar)
-        self.assertTrue('s=256' in gravatar_256)
-        self.assertTrue('r=pg' in gravatar_pg)
-        self.assertTrue('d=retro' in gravatar_retro)
-
     def test_follows(self):
-        u1 = User(email='john@example.com', password='cat')
-        u2 = User(email='susan@example.org', password='dog')
+        a1 = Account(email='john@example.com', password='cat')
+        u1 = User(account=a1)
+        a2 = Account(email='susan@example.org', password='dog')
+        u2 = User(account=a2)
         db.session.add(u1)
         db.session.add(u2)
         db.session.commit()
@@ -141,7 +97,8 @@ class UserModelTestCase(unittest.TestCase):
 
 
     def test_to_json(self):
-        u = User(email='john@example.com', password='cat')
+        a = Account(email='john@example.com', password='cat')
+        u = User(account=a)
         db.session.add(u)
         db.session.commit()
         with self.app.test_request_context('/'):

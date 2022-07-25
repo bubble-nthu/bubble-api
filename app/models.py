@@ -70,6 +70,7 @@ class Permission:
   MODERATE = 8
   ADMIN = 16
 
+
 class Follow(db.Model):
     __tablename__ = 'follows'
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
@@ -77,20 +78,12 @@ class Follow(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(64), unique=True, index=True)
-    username = db.Column(db.String(64), unique=True, index=True)
+    account_id = db.Column(db.Integer, db.ForeignKey('accounts.id'))
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.id'))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    password_hash = db.Column(db.String(128))
-    confirmed = db.Column(db.Boolean, default=False)
-    name = db.Column(db.String(64))
-    location = db.Column(db.String(64))
-    about_me = db.Column(db.Text())
-    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
-    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-    avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     followed = db.relationship('Follow',
                                 foreign_keys=[Follow.follower_id],
@@ -103,10 +96,7 @@ class User(UserMixin, db.Model):
                                 lazy='dynamic',
                                 cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
-
-    @property
-    def password(self):
-        raise AttributeError('password is not a readable attribute')
+    profile = db.relationship('Profile', back_populates='user')
 
     @property
     def followed_posts(self):
@@ -121,10 +111,6 @@ class User(UserMixin, db.Model):
                 db.session.add(user)
                 db.session.commit()
 
-    @password.setter
-    def password(self, password):
-        self.password_hash = generate_password_hash(password)
-
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
@@ -132,8 +118,8 @@ class User(UserMixin, db.Model):
             #  self.role = Role.query.filter_by(name='Administrator').first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
-        if self.email is not None and self.avatar_hash is None:
-            self.avatar_hash = self.gravatar_hash()
+        if self.profile is None:
+            self.profile = Profile(user=self)
         self.follow(self)
 
     def can(self, perm):
@@ -141,25 +127,6 @@ class User(UserMixin, db.Model):
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
-
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def ping(self):
-        self.last_seen = datetime.utcnow()
-        db.session.add(self)
-        db.session.commit()
-
-    def gravatar_hash(self):
-      return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
-
-    def gravatar(self, size=100, default='identicon', rating='g'):
-      #if request.is_secure:
-      url = 'https://secure.gravatar.com/avatar'
-      #else:
-      #    url = 'http://www.gravatar.com/avatar'
-      hash = self.avatar_hash or self.gravatar_hash()
-      return f'{url}/{hash}?s={size}&d={default}&r={rating}'
 
     def follow(self, user):
         if not self.is_following(user):
@@ -185,19 +152,77 @@ class User(UserMixin, db.Model):
 
     def to_json(self):
         json_user = {
+            'username': self.profile.username,
             'url': url_for('api.get_user', id=self.id),
-            'username': self.username,
-            'member_since': self.member_since,
-            'last_seen': self.last_seen,
             'posts_url': url_for('api.get_user_posts', id=self.id),
             'followed_posts_url': url_for('api.get_user_followed_posts',
                                           id=self.id),
-            'post_count': self.posts.count()
+            'post_count': self.posts.count(),
+            'member_since': self.profile.member_since,
+            'last_seen': self.profile.last_seen
         }
         return json_user
 
 
-    #def generate_confirmation_token(self, expiration=3600):
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+
+class Profile(db.Model):
+    __tablename__ = 'profiles'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, index=True)
+    name = db.Column(db.String(64))
+    location = db.Column(db.String(64))
+    about_me = db.Column(db.Text())
+    member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    avatar_hash = db.Column(db.String(32))
+    user = db.relationship('User', back_populates='profile', uselist=False)
+
+    def __init__(self, **kwargs):
+        super(Profile, self).__init__(**kwargs)
+        if self.user.account.email is not None and self.avatar_hash is None:
+            self.avatar_hash = self.gravatar_hash()
+
+
+    def ping(self):
+        self.last_seen = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def gravatar_hash(self):
+        return hashlib.md5(self.user.account.email.lower().encode('utf-8')).hexdigest()
+
+    def gravatar(self, size=100, default='identicon', rating='g'):
+      #if request.is_secure:
+      url = 'https://secure.gravatar.com/avatar'
+      #else:
+      #    url = 'http://www.gravatar.com/avatar'
+      hash = self.avatar_hash or self.gravatar_hash()
+      return f'{url}/{hash}?s={size}&d={default}&r={rating}'
+
+
+class Account(UserMixin, db.Model):
+    __tablename__ = 'accounts'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(64), unique=True, index=True)
+    password_hash = db.Column(db.String(128))
+    confirmed = db.Column(db.Boolean, default=False)
+    users = db.relationship('User', backref='account', lazy='dynamic')
+
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+        #def generate_confirmation_token(self, expiration=3600):
     #    s = Serializer(current_app.config['SECRET_KEY'], expiration)
     #    return s.dumps({'confirm': self.id}).decode('utf-8')
 
@@ -267,10 +292,6 @@ class User(UserMixin, db.Model):
     #    except:
     #        return None
     #    return User.query.get(data['id'])
-
-
-    def __repr__(self):
-        return f'<User {self.username}>'
 
 
 class Post(db.Model):
