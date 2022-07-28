@@ -23,7 +23,7 @@ class FlaskClientTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Stranger' in response.data)
 
-    def test_register_and_login(self):
+    """def test_register_and_login(self):
         # register a new account
         response = self.client.post('/auth/register', data={
             'email': 'john@example.com',
@@ -56,4 +56,4 @@ class FlaskClientTestCase(unittest.TestCase):
         # log out
         response = self.client.get('/auth/logout', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(b'You have been logged out' in response.data)
+        self.assertTrue(b'You have been logged out' in response.data)"""

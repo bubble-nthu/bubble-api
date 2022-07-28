@@ -48,8 +48,9 @@ class TestCaseApiLogin():
         return u.id
 
     def get_token(self, email, password):
+
         response = self.client.post(
-            '/api/v1/tokens',
+            '/api/v1/auth/authenticate',
             headers=self.get_basic_api_headers(email, password))
 
         json_response = json.loads(response.get_data(as_text=True))
@@ -61,7 +62,6 @@ class TestCaseApiLogin():
         #add a user
         email = 'john@example.com'
         password = 'dog'
-        wrong_password = 'cat'
 
         self.add_user(email, password)
 
@@ -80,7 +80,7 @@ class TestCaseApiLogin():
 
         # get token with bad password
         response = self.client.get(
-            '/api/v1/tokens',
+            '/api/v1/auth/authenticate',
             headers=self.get_basic_api_headers(email, wrong_password))
         # email and password not pair, method not allow
         assert response.status_code == 405
@@ -117,7 +117,7 @@ class TestCaseApiLogin():
 
     def test_sad_anonymous_no_token(self):
         response = self.client.get(
-            '/api/v1/tokens',
+            '/api/v1/auth/authenticate',
             headers=self.get_basic_api_headers('', ''))
         
         # no email and password, method not fit
@@ -131,7 +131,7 @@ class TestCaseApiLogin():
 
         # can not get toke
         response = self.client.get(
-            '/api/v1/tokens',
+            '/api/v1/auth/authenticate',
             headers=self.get_basic_api_headers(email, password))
         # email and password not pair, method not allow
         assert response.status_code == 405

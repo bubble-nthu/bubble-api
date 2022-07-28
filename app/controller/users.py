@@ -1,7 +1,7 @@
 from flask import jsonify, request, current_app, url_for, abort
 from . import api
 from ..models import User, Post
-from app.api.authentication import token_auth
+from app.controller.authentication import token_auth
 
 @api.route('/users/<int:id>')
 @token_auth.login_required
