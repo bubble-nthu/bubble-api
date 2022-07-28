@@ -1,15 +1,17 @@
-from flask import jsonify, request, current_app, url_for
+from flask import jsonify, request, current_app, url_for, abort
 from . import api
 from ..models import User, Post
-
+from app.api.authentication import token_auth
 
 @api.route('/users/<int:id>')
+@token_auth.login_required
 def get_user(id):
     user = User.query.get_or_404(id)
     return jsonify(user.to_json())
 
 
 @api.route('/users/<int:id>/posts/')
+@token_auth.login_required
 def get_user_posts(id):
     user = User.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
@@ -32,6 +34,7 @@ def get_user_posts(id):
 
 
 @api.route('/users/<int:id>/timeline/')
+@token_auth.login_required
 def get_user_followed_posts(id):
     user = User.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)

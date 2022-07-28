@@ -13,11 +13,13 @@ def users(count=COUNT):
         u = User(email=fake.email(),
             username=fake.user_name(),
             password='password',
-            confirmed=True,
-            name=fake.name(),
-            location=fake.city(),
-            about_me=fake.text(),
-            member_since=fake.past_date())
+            confirmed=True)
+
+        u.profile.name = fake.name()
+        u.profile.location = fake.city()
+        u.profile.about_me = fake.text()
+        u.profile.member_since = fake.past_date()
+        
         db.session.add(u)
         try:
             db.session.commit()
