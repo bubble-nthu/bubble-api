@@ -5,6 +5,10 @@ from . import api
 from .errors import error_response, forbidden , unauthorized
 from app import db
 from app.services.authenticate_user import AuthenticateUser
+from app.lib.auth_token import AuthToken
+
+class NoTokenError(BaseException):
+    pass
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
@@ -36,7 +40,10 @@ def revoke_token():
 
 @token_auth.verify_token
 def verify_token(token):
-    return User.check_token(token) if token else None
+    if token == '':
+        raise NoTokenError()
+    auth = AuthToken(token)
+    return User.query.filter_by(email=auth.payload["email"]).first if auth else None
 
 @token_auth.error_handler
 def token_auth_error(status):

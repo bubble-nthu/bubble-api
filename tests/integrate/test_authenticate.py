@@ -5,6 +5,7 @@ from base64 import b64encode
 from app import create_app, db
 from app.models import User, Role
 from app.lib.auth_token import AuthToken
+from app.controller.auth import NoTokenError
 
 
 class TestCaseApiLogin():
@@ -94,21 +95,23 @@ class TestCaseApiLogin():
         # email and password not pair, method not allow
         assert response.status_code == 405
 
-    """def test_happy_login(self):
+    def test_happy_login(self):
         email = 'john@example.com'
         password = 'dog'
         username = 'john'
 
         self.add_user(email, password, username)
         auth_user = self.get_auth_user(email, password)
+        auth = AuthToken(auth_user["attributes"]["auth_token"])
+        auth_token = auth.get_token()
 
         id = self.get_user_id(email)
 
         # issue a request with the token
         response = self.client.get(
             f'/api/v1/users/{id}',
-            headers=self.get_bearer_api_headers(token))
-        assert response.status_code == 200"""
+            headers=self.get_bearer_api_headers(auth_token))
+        assert response.status_code == 200
 
     def test_sad_404(self):
         response = self.client.get(
@@ -121,9 +124,10 @@ class TestCaseApiLogin():
         assert json_response['error'] == 'not found'"""
 
     def test_sad_no_auth(self):
-        response = self.client.get('/api/v1/users/1',
+        #since auth_token will fail to generate
+        with pytest.raises(NoTokenError):
+            self.client.get('/api/v1/users/1',
                                    content_type='application/json')
-        assert response.status_code == 401
 
     def test_sad_anonymous_no_token(self):
         response = self.client.get(
