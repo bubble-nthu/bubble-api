@@ -9,6 +9,7 @@ from app.lib.securable import SecureMixin
 class TestCaseLib:
     def setup_method(self):
         self.app = create_app('testing')
+        SecureMixin.setup(self.app.config['MSG_KEY'])
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()

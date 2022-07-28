@@ -4,10 +4,11 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
+from app.lib.auth_token import AuthToken
 from config import config
 from flask_pagedown import PageDown
 
-from .lib.securable import SecureMixin
+from .lib.auth_token import AuthToken
 
 bootstrap = Bootstrap()
 moment = Moment()
@@ -30,7 +31,7 @@ def create_app(config_name):
   login_manager.init_app(app)
   pagedown.init_app(app)
 
-  SecureMixin.setup(app.config['MSG_KEY'])
+  AuthToken.setup(app.config['MSG_KEY'])
 
   if app.config['SSL_REDIRECT']:
     from flask_sslify import SSLify
