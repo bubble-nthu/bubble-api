@@ -11,7 +11,7 @@ class NoTokenError(BaseException):
     pass
 
 basic_auth = HTTPBasicAuth()
-token_auth = HTTPTokenAuth()
+token_auth = HTTPTokenAuth(scheme='Bearer')
 
 @basic_auth.verify_password
 def verify_password(email, password):
@@ -31,19 +31,14 @@ def get_token():
     response = {'data': auth_user}
     return jsonify(response)
 
-@api.route('/auth/authenticate', methods=['DELETE'])
-@token_auth.login_required
-def revoke_token():
-    token_auth.current_user().revoke_token()
-    db.session.commit()
-    return '', 204
-
 @token_auth.verify_token
 def verify_token(token):
     if token == '':
-        raise NoTokenError()
+        return None
+        #raise NoTokenError()
     auth = AuthToken(token)
     return User.query.filter_by(email=auth.payload["email"]).first if auth else None
+    #return to token_auth.current_user()
 
 @token_auth.error_handler
 def token_auth_error(status):
@@ -51,38 +46,10 @@ def token_auth_error(status):
 
 
 
-"""@basic_auth.verify_password
-def verify_password(email_or_token, password):
-    if email_or_token == '':
-        return False
-    if password == '':
-        g.current_user = User.verify_auth_token(email_or_token)
-        g.token_used = True
-        return g.current_user is not None
-    user = User.query.filter_by(email=email_or_token.lower()).first()
-    if not user:
-        return False
-    g.current_user = user
-    g.token_used = False
-    return user.verify_password(password)
-
-
-@basic_auth.error_handler
-def auth_error():
-    return unauthorized('Invalid credentials')
-
-
+"""
 @api.before_request
 @basic_auth.login_required
 def before_request():
     if not g.current_user.is_anonymous and \
             not g.current_user.confirmed:
         return forbidden('Unconfirmed account')"""
-
-
-"""@api.route('/tokens/', methods=['POST'])
-def get_token():
-    if g.current_user.is_anonymous or g.token_used:
-        return unauthorized('Invalid credentials')
-    return jsonify({'token': g.current_user.generate_auth_token(
-        expiration=3600), 'expiration': 3600})"""

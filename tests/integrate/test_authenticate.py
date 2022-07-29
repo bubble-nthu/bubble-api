@@ -124,10 +124,10 @@ class TestCaseApiLogin():
         assert json_response['error'] == 'not found'"""
 
     def test_sad_no_auth(self):
-        #since auth_token will fail to generate
-        with pytest.raises(NoTokenError):
-            self.client.get('/api/v1/users/1',
+        #since no token, the request will get 401 UNAUTHORIZED
+        response = self.client.get('/api/v1/users/1',
                                    content_type='application/json')
+        assert response.status_code == 401                           
 
     def test_sad_anonymous_no_token(self):
         response = self.client.get(
