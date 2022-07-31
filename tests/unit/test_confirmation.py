@@ -22,7 +22,7 @@ class TestCaseConfirmation:
         self.app_context.pop()
   
 
-    def test_generating_valid_confirmation_token(self):
+    """def test_generating_valid_confirmation_token(self):
         email = 'john@example.com'
         token = VerifyRegistration.generate_confirmation_token(email)
         assert email == VerifyRegistration.confirm_token(token)
@@ -33,7 +33,7 @@ class TestCaseConfirmation:
         token_1 = VerifyRegistration.generate_confirmation_token(email_1)
         assert email_2 != VerifyRegistration.confirm_token(token_1)
 
-    """def test_expired_confirmation_token(self):
+    def test_expired_confirmation_token(self):
         u = User(password='cat')
         db.session.add(u)
         db.session.commit()

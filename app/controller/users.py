@@ -1,7 +1,25 @@
 from flask import jsonify, request, current_app, url_for, abort
 from . import api
 from ..models import User, Post
+from app import db
 from app.controller.auth import token_auth
+from app.lib.json_request_body import JsonRequestBody
+
+@api.route('/users', methods=['POST'])
+def new_user():
+    user_info = JsonRequestBody.parse_json_from_request(request)
+    user = User(username=user_info["username"], email=user_info["email"], password=user_info["password"])
+    db.session.add(user)
+    db.session.commit()
+
+    msg = {
+        'message': 'Account created',
+        'data': user.to_json()
+    }
+
+    return jsonify(msg), 201, \
+            {'Location': url_for('api.get_user', id=user.id)}
+
 
 @api.route('/users/<int:id>')
 @token_auth.login_required

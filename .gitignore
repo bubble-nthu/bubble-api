@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/ will also be used
 lib64/
 parts/
 sdist/
@@ -117,3 +117,4 @@ dmypy.json
 
 # Note
 todo.txt
+buffer_code

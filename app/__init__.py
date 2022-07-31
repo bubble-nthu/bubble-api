@@ -30,7 +30,6 @@ def create_app(config_name):
   db.init_app(app)
   login_manager.init_app(app)
   pagedown.init_app(app)
-
   AuthToken.setup(app.config['MSG_KEY'])
 
   if app.config['SSL_REDIRECT']:

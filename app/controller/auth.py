@@ -1,4 +1,4 @@
-from flask import g, jsonify
+from flask import g, request, jsonify
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from ..models import User
 from . import api
@@ -6,6 +6,8 @@ from .errors import error_response, forbidden , unauthorized
 from app import db
 from app.services.authenticate_user import AuthenticateUser
 from app.lib.auth_token import AuthToken
+from app.lib.json_request_body import JsonRequestBody
+from app.services.verify_registration import VerifyRegistration
 
 class NoTokenError(BaseException):
     pass
@@ -44,7 +46,43 @@ def verify_token(token):
 def token_auth_error(status):
     return error_response(status)
 
+@api.route('/auth/register', methods=['GET', 'POST'])
+def register():
+    # POST api/v1/auth/register
 
+    request_data = JsonRequestBody.parse_json_from_request(request)
+    VerifyRegistration(request_data).call()
+    response = {
+        "message": 'Verification email sent'
+    }
+
+    """
+        rescue VerifyRegistration::InvalidRegistration => e
+          routing.halt 400, { message: e.message }.to_json
+        rescue VerifyRegistration::EmailProviderError
+          routing.halt 500, { message: 'Error sending email' }.to_json
+        rescue StandardError => e
+          Api.logger.error "Could not verify registration: #{e.inspect}"
+          routing.halt 500
+    """
+
+    return jsonify(response), 202
+
+
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        email = form.email.data.lower()
+        user = User(email=email,
+                    username=form.username.data,
+                    password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        token = VerifyRegistration.generate_confirmation_token(email)
+        Email.send(user.email, 'Confirm Your Account',
+                   'auth/email/confirm', user=user, token=token)
+        flash('A confirmation email has been sent to you by email.')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register.html', form=form)
 
 """
 @api.before_request

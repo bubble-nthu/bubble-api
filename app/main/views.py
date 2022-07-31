@@ -51,7 +51,6 @@ def show_all():
     resp.set_cookie('show_followed', '', max_age=30*24*60*60) # 30 days
     return resp
 
-
 @main.route('/followed')
 @login_required
 def show_followed():

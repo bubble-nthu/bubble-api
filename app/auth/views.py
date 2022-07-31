@@ -6,10 +6,12 @@ from . import auth
 from .. import db
 from ..models import User
 #from ..email import send_email
-from .forms import LoginForm, RegistrationForm, ChangePasswordForm,\
+from .forms.forms import LoginForm, RegistrationForm, ChangePasswordForm,\
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+from .forms.register_form import RegistrationConfirmForm
 from ..services.verify_registration import VerifyRegistration
 from ..services.email import Email
+from app.lib.auth_token import AuthToken
 
 
 @auth.before_app_request
@@ -22,6 +24,19 @@ def before_request():
                 and request.endpoint != 'static':
             return redirect(url_for('auth.unconfirmed'))"""
 
+@auth.route('/register/<registration_token>', methods=['GET', 'POST'])
+def confirm_register(registration_token):
+    form = RegistrationConfirmForm()
+    if form.validate_on_submit():
+        new_account = AuthToken.detokenize(registration_token)
+        user = User(email=new_account["email"],
+                    username="new_account",
+                    password=form.password.data)
+        breakpoint()
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register_confirmed.html', form=form)
 
 @auth.route('/unconfirmed')
 def unconfirmed():
