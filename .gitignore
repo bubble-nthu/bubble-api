@@ -37,7 +37,7 @@ MANIFEST
 *.sqlite
 
 # Local Database
-*.DS_Store
+**/.DS_Store
 
 # Installer logs
 pip-log.txt
