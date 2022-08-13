@@ -1,8 +1,7 @@
-<p>Dear {{ user.username }},</p>
-<p>Welcome to <b>Bubble</b>!</p>
-<p>To confirm your account please <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a>.</p>
-<p>Alternatively, you can paste the following link in your browser's address bar:</p>
-<p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
-<p>Sincerely,</p>
-<p>The Bubble Team</p>
-<p><small>Note: replies to this email address are not monitored.</small></p>
+<p>嗨嗨 {{ username }}！</p>
+<p>很開心你註冊了 <b>Bubble</b> !</p>
+<p>為了驗證你的帳戶註冊成功，請前往 <a href="{{ register_url }}"> 泡泡傳送門 </a> 確認！</p>
+<p>期待與你的相見，也預祝每個專案就像泡泡一樣，開開心心的冉冉上升！</p>
+<p>敬祝 順心</p>
+<p>泡泡營運團隊 敬上</p>
+<p><small>本信件為自動發出，請勿直接回信。若要回信，請回信至 greendot.nthu@gmail.com.</small></p>

@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
-from ..models import User
+from ...models import User
 
 class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
@@ -15,6 +15,8 @@ class RegistrationForm(FlaskForm):
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Register')
 
+    # prefix validate_ will be called automatically
+    # for more information: https://wtforms.readthedocs.io/en/3.0.x/forms/#wtforms.form.Form.validate
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('Email already registered.')

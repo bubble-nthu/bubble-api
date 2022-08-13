@@ -51,7 +51,6 @@ def show_all():
     resp.set_cookie('show_followed', '', max_age=30*24*60*60) # 30 days
     return resp
 
-
 @main.route('/followed')
 @login_required
 def show_followed():
@@ -70,16 +69,16 @@ def user(username):
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
-        current_user.name = form.name.data
-        current_user.location = form.location.data
-        current_user.about_me = form.about_me.data
+        current_user.profile.name = form.name.data
+        current_user.profile.location = form.location.data
+        current_user.profile.about_me = form.about_me.data
         db.session.add(current_user._get_current_object())
         db.session.commit()
         flash('Your profile has been updated.')
         return redirect(url_for('.user', username=current_user.username))
-    form.name.data = current_user.name
-    form.location.data = current_user.location
-    form.about_me.data = current_user.about_me
+    form.name.data = current_user.profile.name
+    form.location.data = current_user.profile.location
+    form.about_me.data = current_user.profile.about_me
     return render_template('edit_profile.html', form=form)
 
 @main.route('/edit-profile/<int:id>', methods=['GET', 'POST'])

@@ -1,8 +1,8 @@
-import unittest
+import unittest, pytest
 import time
 from datetime import datetime
 from app import create_app, db
-from app.models import User, AnonymousUser, Role, Permission, Follow, Account
+from app.models import User, AnonymousUser, Role, Permission, Follow
 
 
 class UserModelTestCase(unittest.TestCase):
@@ -20,8 +20,7 @@ class UserModelTestCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_user_role(self):
-        a = Account(email='john@example.com', password='cat')
-        u = User(account = a)
+        u = User(email='john@example.com', password='cat')
         self.assertTrue(u.can(Permission.FOLLOW))
         self.assertTrue(u.can(Permission.COMMENT))
         self.assertTrue(u.can(Permission.WRITE))
@@ -30,8 +29,7 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_moderator_role(self):
         role = Role.query.filter_by(name='Moderator').first()
-        a = Account(email='john@example.com', password='cat')
-        user = User(account=a, role=role)
+        user = User(email='john@example.com', password='cat', role=role)
         self.assertTrue(user.can(Permission.FOLLOW))
         self.assertTrue(user.can(Permission.COMMENT))
         self.assertTrue(user.can(Permission.WRITE))
@@ -40,8 +38,7 @@ class UserModelTestCase(unittest.TestCase):
 
     def test_administrator_role(self):
         r = Role.query.filter_by(name='Administrator').first()
-        a = Account(email='john@example.com', password='cat')
-        u = User(account=a, role=r)
+        u = User(email='john@example.com', password='cat', role=r)
         self.assertTrue(u.can(Permission.FOLLOW))
         self.assertTrue(u.can(Permission.COMMENT))
         self.assertTrue(u.can(Permission.WRITE))
@@ -57,10 +54,8 @@ class UserModelTestCase(unittest.TestCase):
         self.assertFalse(u.can(Permission.ADMIN))
 
     def test_follows(self):
-        a1 = Account(email='john@example.com', password='cat')
-        u1 = User(account=a1)
-        a2 = Account(email='susan@example.org', password='dog')
-        u2 = User(account=a2)
+        u1 = User(email='john@example.com', password='cat')
+        u2 = User(email='susan@example.org', password='dog')
         db.session.add(u1)
         db.session.add(u2)
         db.session.commit()
@@ -97,8 +92,7 @@ class UserModelTestCase(unittest.TestCase):
 
 
     def test_to_json(self):
-        a = Account(email='john@example.com', password='cat')
-        u = User(account=a)
+        u = User(email='john@example.com', password='cat')
         db.session.add(u)
         db.session.commit()
         with self.app.test_request_context('/'):
@@ -107,6 +101,26 @@ class UserModelTestCase(unittest.TestCase):
                          'posts_url', 'followed_posts_url', 'post_count']
         self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
         self.assertEqual('/api/v1/users/' + str(u.id), json_user['url'])
+
+
+    def test_password_setter(self):
+        u = User(password='cat')
+        self.assertTrue(u.password_hash is not None)
+
+    def test_no_password_getter(self):
+        u = User(password='cat')
+        with self.assertRaises(AttributeError):
+            u.password
+
+    def test_password_verification(self):
+        u = User(password='cat')
+        self.assertTrue(u.verify_password('cat'))
+        self.assertFalse(u.verify_password('dog'))
+
+    def test_password_salts_are_random(self):
+        u = User(password='cat')
+        u2 = User(password='cat')
+        self.assertTrue(u.password_hash != u2.password_hash)
 
 
     """def test_valid_confirmation_token(self):
