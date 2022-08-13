@@ -31,7 +31,7 @@ class Config:
     def init_app(app):
         pass
 
-"""class DevelopmentConfig(Config):
+class DevelopmentConfig(Config):
     DEBUG = True
     MSG_KEY = secrets['MSG_KEY']
     BUBBLE_API_URL = "http://127.0.0.1:5000"
@@ -50,7 +50,7 @@ class TestingConfig(Config):
     MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
     MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
-    WTF_CSRF_ENABLED = False"""
+    WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
     MSG_KEY = os.environ.get('MSG_KEY')
@@ -96,8 +96,8 @@ class DockerConfig(ProductionConfig):
 
 
 config = {
-    """'development': DevelopmentConfig,
-    'testing': TestingConfig,"""
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
     'production': ProductionConfig,
     'heroku': HerokuConfig,
     'docker': DockerConfig,

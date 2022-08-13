@@ -29,7 +29,7 @@ class TestCaseApiLogin():
         response = self.client.post(
             '/api/v1/auth/authenticate',
             headers=get_basic_api_headers(email, password))
-
+        # email and password should be in body will be better
         json_response = json.loads(response.get_data(as_text=True))
         auth_user = json_response['data']
 
