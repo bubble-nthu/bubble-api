@@ -33,6 +33,12 @@ MANIFEST
 *.manifest
 *.spec
 
+# Database
+*.sqlite
+
+# Local Database
+*.DS_Store
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
