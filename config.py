@@ -1,29 +1,60 @@
 import os
+import yaml
+from yaml.loader import SafeLoader
+import os.path
+
+# Open the file and load the file
+if os.path.exists('secrets.yml'):
+    with open('secrets.yml') as f:
+        secrets = yaml.load(f, Loader=SafeLoader)
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-  SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-  SQLALCHEMY_TRACK_MODIFICATIONS = False
-  BUBBLE_POSTS_PER_PAGE = 10
-  BUBBLE_FOLLOWERS_PER_PAGE = 10
-  BUBBLE_COMMENTS_PER_PAGE = 10
-  SSL_REDIRECT = False
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
+    SECURITY_PASSWORD_SALT  = 'my_precious_two'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    BUBBLE_POSTS_PER_PAGE = 10
+    BUBBLE_FOLLOWERS_PER_PAGE = 10
+    BUBBLE_COMMENTS_PER_PAGE = 10
+    SSL_REDIRECT = False
+    MAIL_SERVER = 'smtp.sendgrid.net'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = 'apikey'
+    MAIL_API_KEY = os.environ.get('MAIL_API_KEY')
+    MAIL_API_URL = os.environ.get('MAIL_API_URL')
+    MAIL_SENDER = os.environ.get('MAIL_SENDER')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 
-  @staticmethod
-  def init_app(app):
-    pass
+    @staticmethod
+    def init_app(app):
+        pass
 
-class DevelopmentConfig(Config):
-  DEBUG = True
-  SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+"""class DevelopmentConfig(Config):
+    DEBUG = True
+    MSG_KEY = secrets['MSG_KEY']
+    BUBBLE_API_URL = "http://127.0.0.1:5000"
+    MAIL_API_KEY = secrets['SENDGRID_API_KEY']
+    MAIL_API_URL = secrets['SENDGRID_API_URL']
+    MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
 class TestingConfig(Config):
-  TESTING = True
-  SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
-  WTF_CSRF_ENABLED = False
+    TESTING = True
+    MSG_KEY = secrets['MSG_KEY']
+    BUBBLE_API_URL = "http://127.0.0.1:5000"
+    MAIL_API_KEY = secrets['SENDGRID_API_KEY']
+    MAIL_API_URL = secrets['SENDGRID_API_URL']
+    MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
+    WTF_CSRF_ENABLED = False"""
 
 class ProductionConfig(Config):
-  SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    MSG_KEY = os.environ.get('MSG_KEY')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 
 class HerokuConfig(ProductionConfig):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
@@ -65,11 +96,11 @@ class DockerConfig(ProductionConfig):
 
 
 config = {
-    'development': DevelopmentConfig,
-    'testing': TestingConfig,
+    """'development': DevelopmentConfig,
+    'testing': TestingConfig,"""
     'production': ProductionConfig,
     'heroku': HerokuConfig,
     'docker': DockerConfig,
 
-    'default': DevelopmentConfig
+    #'default': DevelopmentConfig
 }
