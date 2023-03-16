@@ -4,10 +4,6 @@ from yaml.loader import SafeLoader
 import os.path
 
 # Open the file and load the file
-if os.path.exists('secrets.yml'):
-    with open('secrets.yml') as f:
-        secrets = yaml.load(f, Loader=SafeLoader)
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
@@ -32,23 +28,29 @@ class Config:
         pass
 
 class DevelopmentConfig(Config):
+    with open('secrets.yml') as f:
+        secrets = yaml.load(f, Loader=SafeLoader)
+        secrets = secrets['development']
     DEBUG = True
     MSG_KEY = secrets['MSG_KEY']
     BUBBLE_API_URL = "http://127.0.0.1:5000"
     MAIL_API_KEY = secrets['SENDGRID_API_KEY']
     MAIL_API_URL = secrets['SENDGRID_API_URL']
-    MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
-    MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    #MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    #MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
 class TestingConfig(Config):
+    with open('secrets.yml') as f:
+        secrets = yaml.load(f, Loader=SafeLoader)
+        secrets = secrets['test']
     TESTING = True
     MSG_KEY = secrets['MSG_KEY']
     BUBBLE_API_URL = "http://127.0.0.1:5000"
     MAIL_API_KEY = secrets['SENDGRID_API_KEY']
     MAIL_API_URL = secrets['SENDGRID_API_URL']
-    MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
-    MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    #MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
+    #MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
     WTF_CSRF_ENABLED = False
 
@@ -102,5 +104,5 @@ config = {
     'heroku': HerokuConfig,
     'docker': DockerConfig,
 
-    #'default': DevelopmentConfig
+    'default': DevelopmentConfig,
 }
