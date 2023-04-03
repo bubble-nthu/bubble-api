@@ -75,14 +75,14 @@ def register():
         user = User(email=email,
                     username=form.username.data,
                     password=form.password.data)
-        db.session.add(user)
+        """ db.session.add(user)
         db.session.commit()
         token = VerifyRegistration.generate_confirmation_token(email)
         Email.send(user.email, 'Confirm Your Account',
-                   'auth/email/confirm', user=user, token=token)
+                   'auth/email/confirm', user=user, token=token) """
         
         flash('A confirmation email has been sent to you by email.')
-        return redirect(url_for('auth.login'))
+        # post to api
     return render_template('auth/register.html', form=form)
 
 
