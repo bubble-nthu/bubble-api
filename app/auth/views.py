@@ -80,6 +80,7 @@ def register():
         token = VerifyRegistration.generate_confirmation_token(email)
         Email.send(user.email, 'Confirm Your Account',
                    'auth/email/confirm', user=user, token=token)
+        
         flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)

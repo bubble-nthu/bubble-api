@@ -12,7 +12,6 @@ import click
 from app import create_app, db, fake
 from app.models import User, Role, Permission
 from flask_migrate import Migrate, upgrade
-
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 migrate = Migrate(app, db, render_as_batch=True)
 

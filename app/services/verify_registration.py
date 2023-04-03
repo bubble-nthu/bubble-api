@@ -1,6 +1,6 @@
-from itsdangerous import URLSafeTimedSerializer
-from flask import render_template, current_app
-import requests
+#from itsdangerous import URLSafeTimedSerializer
+#from flask import render_template, current_app
+#import requests
 
 from app.models import User
 from app.services.send_email import Email
