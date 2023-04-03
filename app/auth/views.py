@@ -32,7 +32,6 @@ def confirm_register(registration_token):
         user = User(email=new_account["email"],
                     username="new_account",
                     password=form.password.data)
-        breakpoint()
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('auth.login'))

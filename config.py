@@ -36,6 +36,8 @@ class DevelopmentConfig(Config):
     BUBBLE_API_URL = "http://127.0.0.1:5000"
     MAIL_API_KEY = secrets['SENDGRID_API_KEY']
     MAIL_API_URL = secrets['SENDGRID_API_URL']
+    AWS_ACCESS_KEY_ID = secrets['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = secrets['AWS_SECRET_ACCESS_KEY']
     #MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
     #MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
@@ -49,6 +51,8 @@ class TestingConfig(Config):
     BUBBLE_API_URL = "http://127.0.0.1:5000"
     MAIL_API_KEY = secrets['SENDGRID_API_KEY']
     MAIL_API_URL = secrets['SENDGRID_API_URL']
+    AWS_ACCESS_KEY_ID = secrets['AWS_ACCESS_KEY_ID']
+    AWS_SECRET_ACCESS_KEY = secrets['AWS_SECRET_ACCESS_KEY']
     #MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
     #MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')

@@ -34,7 +34,6 @@ class TestCaseApiRegister():
         }
         registration_token = AuthToken.tokenize(registration)
         registration['verification_url'] = f"{current_app.config['BUBBLE_API_URL']}/auth/register/{registration_token}"
-
         #send to register
         response = self.client.post(
             f'/api/v1/auth/register',

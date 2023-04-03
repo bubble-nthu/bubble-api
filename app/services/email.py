@@ -1,6 +1,5 @@
 from flask import render_template, current_app
 import requests
-from flask import render_template, current_app
 from flask_mail import Message
 
 from .. import mail
