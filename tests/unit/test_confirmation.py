@@ -22,7 +22,7 @@ class TestCaseConfirmation:
         self.app_context.pop()
   
 
-    """def test_generating_valid_confirmation_token(self):
+"""     def test_generating_valid_confirmation_token(self):
         email = 'john@example.com'
         token = VerifyRegistration.generate_confirmation_token(email)
         assert email == VerifyRegistration.confirm_token(token)
@@ -83,4 +83,4 @@ class TestCaseConfirmation:
         db.session.commit()
         token = u2.generate_email_change_token('john@example.com')
         self.assertFalse(u2.change_email(token))
-        self.assertTrue(u2.email == 'susan@example.org')"""
+        self.assertTrue(u2.email == 'susan@example.org') """

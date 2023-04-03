@@ -25,30 +25,11 @@ class Email:
         # self.mail_api_key = current_app.config['MAIL_API_KEY']
         self.html_email = render_template('auth/email/confirm' + '.html', username = self.setting["username"], 
                                             register_url = self.setting["verification_url"])
-
-    def mail_body_html(self):
-        body_html = """<html>
-<head></head>
-<body>
-  <h1>Amazon SES Test (SDK for Python)</h1>
-  <p>This email was sent with
-    <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-    <a href='https://aws.amazon.com/sdk-for-python/'>
-      AWS SDK for Python (Boto)</a>.</p>
-</body>
-</html>
-            """
-        return body_html
-
-    def mail_body_text(self):
-        body_text = ("Amazon SES Test (Python)\r\n"
-             "This email was sent with Amazon SES using the "
-             "AWS SDK for Python (Boto)."
-            )
-        return body_text
+        self.text_email = render_template('auth/email/confirm' + '.txt', username = self.setting["username"], 
+                                            register_url = self.setting["verification_url"])
 
     def mail_subject(self):
-        subject = "Amazon SES Test (SDK for Python)"
+        subject = "帳號註冊驗證信｜Bubble"
         return subject
 
     def send_email_verification(self):
@@ -72,11 +53,11 @@ class Email:
                     'Body': {
                         'Html': {
                             'Charset': self.charset,
-                            'Data': self.mail_body_html(),
+                            'Data': self.html_email,
                         },
                         'Text': {
                             'Charset': self.charset,
-                            'Data': self.mail_body_text(),
+                            'Data': self.text_email,
                         },
                     },
                     'Subject': {

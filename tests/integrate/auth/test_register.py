@@ -25,8 +25,8 @@ class TestCaseApiRegister():
 
     def test_happy_register(self):
         #generate token
-        username = "river1440"
-        email = "river1400@gapp.nthu.edu.tw"
+        username = "NTHU Bubble"
+        email = "bubble.sdgs@gmail.com"
 
         registration = {
             "username": username,
