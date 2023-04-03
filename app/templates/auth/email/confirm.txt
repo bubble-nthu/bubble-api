@@ -1,13 +1,12 @@
-Dear {{ user.username }},
+嗨嗨 {{ username }}！
+很開心你註冊了 Bubble!
 
-Welcome to Bubble!
+為了驗證你的帳戶註冊成功，請前往以下連結：
+{{ register_url }}
 
-To confirm your account please click on the following link:
+期待與你的相見，也預祝每個專案就像泡泡一樣，開開心心的冉冉上升！
 
-{{ url_for('auth.confirm', token=token, _external=True) }}
+敬祝 順心
+泡泡營運團隊 敬上
 
-Sincerely,
-
-The Bubble Team
-
-Note: replies to this email address are not monitored.
+本信件為自動發出，請勿直接回信。若要回信，請回信至 bubble.sdgs@gmail.com.
