@@ -10,7 +10,7 @@ from .forms.forms import LoginForm, RegistrationForm, ChangePasswordForm,\
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
 from .forms.register_form import RegistrationConfirmForm
 from ..services.verify_registration import VerifyRegistration
-from ..services.email import Email
+from ..services.send_email import Email
 from app.lib.auth_token import AuthToken
 
 

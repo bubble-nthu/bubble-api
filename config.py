@@ -14,14 +14,13 @@ class Config:
     BUBBLE_FOLLOWERS_PER_PAGE = 10
     BUBBLE_COMMENTS_PER_PAGE = 10
     SSL_REDIRECT = False
-    MAIL_SERVER = 'smtp.sendgrid.net'
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = 'apikey'
-    MAIL_API_KEY = os.environ.get('MAIL_API_KEY')
-    MAIL_API_URL = os.environ.get('MAIL_API_URL')
-    MAIL_SENDER = os.environ.get('MAIL_SENDER')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+    # MAIL_SERVER = 'smtp.sendgrid.net'
+    # MAIL_PORT = 587
+    # MAIL_USE_TLS = True
+    # MAIL_USERNAME = 'apikey'
+    # MAIL_API_KEY = os.environ.get('MAIL_API_KEY')
+    # MAIL_API_URL = os.environ.get('MAIL_API_URL')
+    # MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 
     @staticmethod
     def init_app(app):
@@ -34,10 +33,12 @@ class DevelopmentConfig(Config):
     DEBUG = True
     MSG_KEY = secrets['MSG_KEY']
     BUBBLE_API_URL = "http://127.0.0.1:5000"
-    MAIL_API_KEY = secrets['SENDGRID_API_KEY']
-    MAIL_API_URL = secrets['SENDGRID_API_URL']
+    # MAIL_API_KEY = secrets['SENDGRID_API_KEY']
+    # MAIL_API_URL = secrets['SENDGRID_API_URL']
     AWS_ACCESS_KEY_ID = secrets['AWS_ACCESS_KEY_ID']
     AWS_SECRET_ACCESS_KEY = secrets['AWS_SECRET_ACCESS_KEY']
+    MAIL_SENDER = secrets['MAIL_SENDER']
+    AWS_REGION_SES = secrets['AWS_REGION_SES']
     #MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
     #MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
@@ -49,10 +50,12 @@ class TestingConfig(Config):
     TESTING = True
     MSG_KEY = secrets['MSG_KEY']
     BUBBLE_API_URL = "http://127.0.0.1:5000"
-    MAIL_API_KEY = secrets['SENDGRID_API_KEY']
-    MAIL_API_URL = secrets['SENDGRID_API_URL']
+    # MAIL_API_KEY = secrets['SENDGRID_API_KEY']
+    # MAIL_API_URL = secrets['SENDGRID_API_URL']
     AWS_ACCESS_KEY_ID = secrets['AWS_ACCESS_KEY_ID']
     AWS_SECRET_ACCESS_KEY = secrets['AWS_SECRET_ACCESS_KEY']
+    MAIL_SENDER = secrets['MAIL_SENDER']
+    AWS_REGION_SES = secrets['AWS_REGION_SES']
     #MAIL_SENDER = secrets['SENDGRID_MAIL_SENDER']
     #MAIL_DEFAULT_SENDER = secrets['SENDGRID_MAIL_SENDER']
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')

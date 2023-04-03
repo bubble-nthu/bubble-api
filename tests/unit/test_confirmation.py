@@ -4,7 +4,7 @@ from datetime import datetime
 from app import create_app, db
 from app.models import User, AnonymousUser, Role, Permission, Follow
 from app.services.verify_registration import VerifyRegistration
-from app.services.email import Email
+from app.services.send_email import Email
 
 
 class TestCaseConfirmation:
